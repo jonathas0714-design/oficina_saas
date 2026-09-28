@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nicolauto - Orçamento Oficina</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --border: #e5e7eb;
+            --bg: #f3f4f6;
+        }
+        
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); padding: 30px 20px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
+        .bloco { background: white; padding: 40px; border-radius: 12px; max-width: 850px; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05); position: relative; }
+        
+        /* CABEÇALHO EDITÁVEL */
+        .topo-oficina { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px solid var(--border); }
+        .logo-lado { flex: 1; }
+        .editavel-txt { border: 1px dashed transparent; padding: 2px 4px; border-radius: 4px; transition: all 0.2s; outline: none; }
+        .editavel-txt:hover { border-color: #9ca3af; background-color: #f9fafb; cursor: pointer; }
+        .editavel-txt:focus { border-color: var(--primary); background-color: white; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
+        
+        .logo-lado h1 { margin: 0 0 4px 0; color: var(--primary); font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-lado p { margin: 0 0 12px 0; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .contato-oficina { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 400px; white-space: pre-line; }
+        
+        .num-orcamento-box { font-size: 16px; font-weight: 800; color: var(--primary); background: var(--primary-light); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(30, 58, 138, 0.1); display: inline-block; margin-bottom: 10px; }
+        .data-lado { text-align: right; min-width: 160px; }
+        
+        /* SEÇÕES PROFISSIONAIS */
+        .secao-container { background: #f9fafb; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .secao-titulo { font-size: 13px; color: var(--primary); font-weight: 700; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 0.75px; display: flex; align-items: center; gap: 6px; }
+        .secao-titulo::after { content: ''; flex: 1; height: 1px; background: var(--border); margin-left: 10px; }
+        
+        .campo { display: flex; flex-direction: column; margin-bottom: 0; flex: 1; }
+        label { font-weight: 600; font-size: 12px; margin-bottom: 6px; color: var(--text-muted); }
+        input { padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; width: 100%; background: white; color: var(--text-main); transition: all 0.15s ease; }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
+        input::placeholder { color: #9ca3af; }
+        .linha { display: flex; gap: 16px; margin-bottom: 14px; }
+        .linha:last-child { margin-bottom: 0; }
+        
+        /* BOTÕES E TABELAS */
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; display: inline-block; text-align: center; box-sizing: border-box; transition: all 0.15s ease; }
+        .btn-add { background: var(--primary); color: white; width: auto; margin-left: auto; display: block; }
+        .btn-add:hover { background: #1d4ed8; }
+        
+        .acoes-container { display: flex; gap: 16px; margin-top: 30px; }
+        .btn-pdf { background: #10b981; color: white; font-size: 15px; flex: 3; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); }
+        .btn-pdf:hover { background: #059669; box-shadow: 0 6px 12px -1px rgba(16, 185, 129, 0.3); }
+        .btn-limpar { background: #6b7280; color: white; font-size: 15px; flex: 1; font-weight: 600; }
+        .btn-limpar:hover { background: #4b5563; }
+        
+        .btn-del { background: #fee2e2; color: #ef4444; padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-del:hover { background: #fca5a5; color: #b91c1c; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 14px 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; }
+        th { background: #f8fafc; color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        tr:hover td { background-color: #f8fafc; }
+        
+        .total-container { margin-top: 30px; padding: 20px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; text-align: right; font-size: 14px; line-height: 1.8; }
+        .total-geral { font-size: 26px; font-weight: 800; color: var(--primary); margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; letter-spacing: -0.5px; }
+        
+        /* TERMOS E GARANTIA */
+        .garantia-container { margin-top: 25px; padding: 15px; background: var(--primary-light); border: 1px solid rgba(30, 58, 138, 0.1); border-radius: 8px; text-align: center; }
+        .garantia-texto { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        
+        .bloco-assinaturas { display: none; margin-top: 60px; justify-content: space-between; gap: 50px; text-align: center; }
+        .linha-assinatura { flex: 1; border-top: 1px solid #9ca3af; padding-top: 10px; font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 40px; }
+
+        /* HISTÓRICO VISUAL */
+        .historico-section { margin-top: 40px; padding-top: 30px; border-top: 3px double var(--border); }
+        .historico-item { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 16px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; font-size: 14px; }
+        .btn-reciclar { background: #eff6ff; color: var(--primary); border: 1px solid rgba(30, 58, 138, 0.2); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .btn-reciclar:hover { background: #dbeafe; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .bloco { box-shadow: none; padding: 0; max-width: 100%; }
+            .secao-container { background: transparent; border: 1px solid #d1d5db; }
+            .editavel-txt:hover, .editavel-txt:focus { border-color: transparent; background: transparent; box-shadow: none; }
+            input { border: none; border-bottom: 1px dashed #9ca3af; background: transparent; padding: 2px 0; font-size: 14px; font-weight: 700; color: black; pointer-events: none; border-radius: 0; }
+            th { background: #f3f4f6 !important; color: black; }
+            .total-container { background: transparent; }
+            .garantia-container { background: transparent; border: 1px dashed #9ca3af; }
+            .bloco-assinaturas { display: flex !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bloco">
+    <!-- CABEÇALHO EDITÁVEL COM SALVAMENTO -->
+    <div class="topo-oficina">
+        <div class="logo-lado">
+            <h1 id="oficinaNome" class="editavel-txt" contenteditable="true" onblur="salvarOficina()">🔧 NICOLAUTO</h1>
+            <p id="oficinaSlogan" class="editavel-txt" contenteditable="true" onblur="salvarOficina()">Orçamento de Serviços Automotivos</p>
+            <div id="oficinaContato" class="editavel-txt contato-oficina" contenteditable="true" onblur="salvarOficina()">📍 Rua César Salles Barbosa, 4 - Belo Horizonte, MG
+📞 Telefone: 31 9518-6991</div>
+        </div>
+        <div class="data-lado">
+            <div class="num-orcamento-box">
+                Orçamento Nº <span id="numOrcamentoTxt">0001</span>
+            </div>
+            <div class="campo">
+                <label>Data de Emissão</label>
+                <input type="text" id="dataEmissao" style="text-align: right;">
+            </div>
+        </div>
+    </div>
+    
+    <!-- BLOCO 1: DADOS DO CLIENTE -->
+    <div class="secao-container">
+        <div class="secao-titulo">👤 Dados do Cliente</div>
+        <div class="linha">
+            <div class="campo" style="flex: 2;">
+                <label>Nome do Cliente</label>
+                <input type="text" id="cliente" placeholder="Nome completo do cliente">
+            </div>
+        </div>
+        <div class="linha">
+            <div class="campo">
+                <label>Telefone do Cliente</label>
+                <input type="text" id="telefoneCliente" placeholder="Ex: (31) 99999-9999" maxlength="15" oninput="mascaraTel(this)">
+            </div>
+            <div class="campo">
+                <label>E-mail do Cliente</label>
+                <input type="text" id="emailCliente" placeholder="Ex: cliente@email.com">
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOCO 2: DADOS DO VEÍCULO -->
+    <div class="secao-container">
+        <div class="secao-titulo">🚘 Dados do Veículo</div>
+        <div class="linha">
+            <div class="campo" style="flex: 2;">
+                <label>Marca / Modelo do Veículo</label>
+                <input type="text" id="veiculo" placeholder="Ex: VW Gol 1.0">
+            </div>
+        </div>
+        <div class="linha">
+            <div class="campo" style="flex: 1;">
+                <label>Ano</label>
+                <input type="text" id="ano" placeholder="Ex: 2015" maxlength="9">
+            </div>
+            <div class="campo" style="flex: 1;">
+                <label>Placa</label>
+                <input type="text" id="placa" placeholder="Ex: ABC1D23" oninput="mascaraPlaca(this)">
+            </div>
+            <div class="campo" style="flex: 1.2;">
+                <label>Quilometragem (KM)</label>
+                <input type="text" id="quilometragem" placeholder="Ex: 85.000">
+            </div>
+        </div>
+    </div>
+
+    <div class="no-print secao-container">
+        <div class="secao-titulo">🛠️ Adicionar Peça / Serviço</div>
+        <div class="linha">
+            <div class="campo">
+                <label>Descrição do Defeito ou Serviço</label>
+                <input type="text" id="desc" placeholder="Ex: Troca de pastilhas de freio dianteiras">
+            </div>
+        </div>
+        <div class="linha" style="margin-top: 12px;">
+            <div class="campo">
+                <label>Valor Peça (R$)</label>
+                <input type="text" id="vPeca" placeholder="0,00">
+            </div>
+            <div class="campo">
+                <label>Valor Mão de Obra (R$)</label>
+                <input type="text" id="vMao" placeholder="0,00">
+            </div>
+        </div>
+        <button type="button" class="btn btn-add" style="margin-top: 14px;" onclick="adicionarItem()">+ Incluir na Lista</button>
+    </div>
+
+    <div class="secao-titulo" style="margin-top: 25px;">📋 Itens do Orçamento</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição do Serviço / Peça</th>
+                <th>Valor Peça</th>
+                <th>Mão de Obra</th>
+                <th>Subtotal</th>
+                <th class="no-print" style="width: 50px;">Ação</th>
+            </tr>
+        </thead>
+        <tbody id="listaItens"></tbody>
+    </table>
+
+    <div class="total-container">
+        <div>Total em Peças: R$ <span id="totalPecas">0,00</span></div>
+        <div>Total Mão de Obra: R$ <span id="totalMao">0,00</span></div>
+        <div class="total-geral">Total Geral: R$ <span id="valorTotal">0,00</span></div>
+    </div>
+
+    <div class="secao-container" style="margin-top: 25px;">
+        <div class="secao-titulo">⚙️ Condições e Observações</div>
+        <div class="linha">
+            <div class="campo">
+                <label>Forma de Pagamento</label>
+                <input type="text" id="pagamento" placeholder="Ex: Pix ou Cartão">
+            </div>
+            <div class="campo">
+                <label>Validade do Orçamento</label>
+                <input type="text" id="validade" value="5 dias">
+            </div>
+        </div>
+    </div>
+
+    <div class="garantia-container">
+        <div class="garantia-texto">
+            🛡️ A garantia do serviço é de 90 dias.
+        </div>
+    </div>
+
+    <div class="bloco-assinaturas">
+        <div class="linha-assinatura">Assinatura do Cliente</div>
+        <div class="linha-assinatura">Nicolauto Oficina</div>
+    </div>
+
+    <div class="acoes-container no-print">
+        <button type="button" class="btn btn-limpar" onclick="limparFormulario()">🧹 Novo Orçamento</button>
+        <button type="button" class="btn btn-pdf" onclick="emitirOrcamento()">📄 Gerar PDF / Imprimir Orçamento</button>
+    </div>
+
+    <div class="historico-section no-print">
+        <div class="secao-titulo">🕒 Últimos Orçamentos Emitidos (Salvos no Computador)</div>
+        <div id="listaHistorico"></div>
+    </div>
+</div>
+
+<script>
+    var itens = [];
+    var numeroAtual = 1;
+
+    // Recupera dados gravados na inicialização
+    window.onload = function() {
+        if(localStorage.getItem('oficinaNome')) document.getElementById('oficinaNome').innerText = localStorage.getItem('oficinaNome');
+        if(localStorage.getItem('oficinaSlogan')) document.getElementById('oficinaSlogan').innerText = localStorage.getItem('oficinaSlogan');
+        if(localStorage.getItem('oficinaContato')) document.getElementById('oficinaContato').innerText = localStorage.getItem('oficinaContato');
+        
+        if(localStorage.getItem('proximoNumero')) {
+            numeroAtual = parseInt(localStorage.getItem('proximoNumero'));
+        }
+        atualizarContadorVisual();
+        renderizarHistorico();
+
+        var hoje = new Date();
+        var dia = String(hoje.getDate()).padStart(2, '0');
+        var mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        var ano = hoje.getFullYear();
+        document.getElementById('dataEmissao').value = dia + '/' + mes + '/' + ano;
+    };
+
+    // MÁSCARAS DE DIGITAÇÃO AUTOMÁTICA
+    function mascaraTel(input) {
+        let v = input.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0, 11);
+        if (v.length > 6) {
+            input.value = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+        } else if (v.length > 2) {
+            input.value = `(${v.slice(0, 2)}) ${v.slice(2)}`;
+        } else if (v.length > 0) {
+            input.value = `(${v}`;
+        }
+    }
+
+    function mascaraPlaca(input) {
+        let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (v.length > 7) v = v.slice(0, 7);
+        if (v.length > 3 && /^[A-Z]{3}\d/.test(v)) {
+            input.value = v.slice(0, 3) + '-' + v.slice(3);
+        } else {
+            input.value = v;
+        }
+    }
+
+    function salvarOficina() {
+        localStorage.setItem('oficinaNome', document.getElementById('oficinaNome').innerText);
+        localStorage.setItem('oficinaSlogan', document.getElementById('oficinaSlogan').innerText);
+        localStorage.setItem('oficinaContato', document.getElementById('oficinaContato').innerText);
+    }
+
+    function atualizarContadorVisual() {
+        document.getElementById('numOrcamentoTxt').innerText = String(numeroAtual).padStart(4, '0');
+    }
+
+    function limparTexto(texto) {
+        if (!texto) return 0;
+        var limpo = texto.trim().replace(',', '.');
+        var n = parseFloat(limpo);
+        return isNaN(n) ? 0 : n;
+    }
+
+    function formatarMoeda(v) {
+        return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function atualizarTela() {
+        var tabela = document.getElementById('listaItens');
+        tabela.innerHTML = "";
+        var tPecas = 0;
+        var tMao = 0;
+
+        for (var i = 0; i < itens.length; i++) {
+            var item = itens[i];
+            tPecas += item.peca;
+            tMao += item.mao;
+
+            tabela.innerHTML += "<tr>" +
+                "<td>" + item.desc + "</td>" +
+                "<td>R$ " + formatarMoeda(item.peca) + "</td>" +
+                "<td>R$ " + formatarMoeda(item.mao) + "</td>" +
+                "<td><strong>R$ " + formatarMoeda(item.peca + item.mao) + "</strong></td>" +
+                "<td class='no-print'><button type='button' class='btn-del' onclick='removerItem(" + i + ")'>❌</button></td>" +
+            "</tr>";
+        }
+
+        document.getElementById('totalPecas').innerText = formatarMoeda(tPecas);
+        document.getElementById('totalMao').innerText = formatarMoeda(tMao);
+        document.getElementById('valorTotal').innerText = formatarMoeda(tPecas + tMao);
+    }
+
+    function adicionarItem() {
+        var d = document.getElementById('desc').value.trim();
+        var p = document.getElementById('vPeca').value;
+        var m = document.getElementById('vMao').value;
+
+        if (d === "") {
+            alert("Por favor, digite a descrição.");
+            return;
+        }
+
+        itens.push({ desc: d, peca: limparTexto(p), mao: limparTexto(m) });
+        atualizarTela();
+
+        document.getElementById('desc').value = "";
+        document.getElementById('vPeca').value = "";
+        document.getElementById('vMao').value = "";
+        document.getElementById('desc').focus();
+    }
+
+    function removerItem(index) {
+        itens.splice(index, 1);
+        atualizarTela();
+    }
+
+    function limparFormulario() {
+        document.getElementById('cliente').value = "";
+        document.getElementById('telefoneCliente').value = "";
+        document.getElementById('emailCliente').value = "";
+        document.getElementById('veiculo').value = "";
+        document.getElementById('ano').value = "";
+        document.getElementById('placa').value = "";
+        document.getElementById('quilometragem').value = "";
+        document.getElementById('desc').value = "";
+        document.getElementById('vPeca').value = "";
+        document.getElementById('vMao').value = "";
+        document.getElementById('pagamento').value = "";
+        
+        itens = [];
+        atualizarTela();
+        document.getElementById('cliente').focus();
+    }
+
+    function emitirOrcamento() {
+        var clie = document.getElementById('cliente').value.trim() || "Cliente não informado";
+        var veic = document.getElementById('veiculo').value.trim() || "Veículo não informado";
+        var total = document.getElementById('valorTotal').innerText;
+
+        var historico = JSON.parse(localStorage.getItem('historicoOrcamentos') || '[]');
+        var novoRegistro = {
+            numero: String(numeroAtual).padStart(4, '0'),
+            data: document.getElementById('dataEmissao').value,
+            cliente: clie,
+            veiculo: veic,
+            total: total,
+            dadosForm: {
+                cliente: document.getElementById('cliente').value,
+                telefone: document.getElementById('telefoneCliente').value,
+                email: document.getElementById('emailCliente').value,
+                veiculo: document.getElementById('veiculo').value,
+                ano: document.getElementById('ano').value,
+                placa: document.getElementById('placa').value,
+                km: document.getElementById('quilometragem').value,
+                pagamento: document.getElementById('pagamento').value,
+                validade: document.getElementById('validade').value,
+                itens: itens
+            }
+        };
+
+        historico.unshift(novoRegistro);
+        if (historico.length > 10) historico.pop();
+        localStorage.setItem('historicoOrcamentos', JSON.stringify(historico));
+
+        window.print();
+
+        numeroAtual += 1;
+        localStorage.setItem('proximoNumero', numeroAtual);
+        atualizarContadorVisual();
+        renderizarHistorico();
+    }
+
+    function renderizarHistorico() {
+        var container = document.getElementById('listaHistorico');
+        var historico = JSON.parse(localStorage.getItem('historicoOrcamentos') || '[]');
+        
+        if (historico.length === 0) {
+            container.innerHTML = "<p style='font-size:13px; color:#9ca3af;'>Nenhum orçamento emitido recentemente.</p>";
+            return;
+        }
+
+        container.innerHTML = "";
+        for (var i = 0; i < historico.length; i++) {
+            var item = historico[i];
+            container.innerHTML += "<div class='historico-item'>" +
+                "<div><strong>Nº " + item.numero + "</strong> (" + item.data + ") - " + item.cliente + " [" + item.veiculo + "] - <strong>R$ " + item.total + "</strong></div>" +
+                "<button class='btn-reciclar' onclick='recarregarOrcamento(" + i + ")'>Recarregar</button>" +
+            "</div>";
+        }
+    }
+
+    function recarregarOrcamento(index) {
+        var historico = JSON.parse(localStorage.getItem('historicoOrcamentos') || '[]');
+        var registro = historico[index];
+        if(!registro) return;
+
+        var d = registro.dadosForm;
+        document.getElementById('cliente').value = d.cliente;
+        document.getElementById('telefoneCliente').value = d.telefone;
+        document.getElementById('emailCliente').value = d.email;
+        document.getElementById('veiculo').value = d.veiculo;
+        document.getElementById('ano').value = d.ano;
+        document.getElementById('placa').value = d.placa;
+        document.getElementById('quilometragem').value = d.km;
+        document.getElementById('pagamento').value = d.pagamento;
+        document.getElementById('validade').value = d.validade;
+
+        itens = d.itens || [];
+        atualizarTela();
+        alert("Orçamento Nº " + registro.numero + " recarregado na tela!");
+    }
+
+    document.addEventListener('keydown', function(event) {
+        const isArrowUp = event.key === 'ArrowUp';
+        const isArrowDown = event.key === 'ArrowDown';
+        const isEnter = event.key === 'Enter';
+
+        if (isArrowUp || isArrowDown || isEnter) {
+            const fluxoCampos = [
+                'oficinaNome',
+                'oficinaSlogan',
+                'oficinaContato',
+                'dataEmissao',
+                'cliente',
+                'telefoneCliente',
+                'emailCliente',
+                'veiculo',
+                'ano',
+                'placa',
+                'quilometragem',
+                'desc',
+                'vPeca',
+                'vMao',
+                'pagamento',
+                'validade'
+            ];
+
+            const idAtivo = document.activeElement.id;
+            const index = fluxoCampos.indexOf(idAtivo);
+
+            if (index > -1) {
+                if (idAtivo === 'oficinaContato' && isEnter) return;
+
+                if (isEnter && idAtivo === 'vMao') {
+                    event.preventDefault();
+                    adicionarItem();
+                    return;
+                }
+
+                if ((isArrowDown || isEnter) && index < fluxoCampos.length - 1) {
+                    event.preventDefault();
+                    const proximo = document.getElementById(fluxoCampos[index + 1]);
+                    if (proximo) proximo.focus();
+                } 
+                else if (isArrowUp && index > 0) {
+                    event.preventDefault();
+                    const anterior = document.getElementById(fluxoCampos[index - 1]);
+                    if (anterior) anterior.focus();
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
